@@ -1,4 +1,4 @@
-# SAM-for-Seismic-
+# SAM-prompting
 Original code: Mohammad Alotaibi <br>
 
 # Instructions: 

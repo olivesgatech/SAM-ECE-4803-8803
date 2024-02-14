@@ -66,8 +66,8 @@ sam.to(device=device)
 
 predictor = SamPredictor(sam)
 
-names = np.load("dolphin_above_samples.npy", allow_pickle=True)
-labels = np.load("dolphin_above_labels.npy", allow_pickle=True)
+names = np.load("samples.npy", allow_pickle=True)
+labels = np.load("labels.npy", allow_pickle=True)
 
 # %%
 
@@ -165,7 +165,7 @@ while c < 150 and not f:
     greeny = []
     redy = []
     # label=plt.imread('C:/Users/Mohammed/Downloads/labels/'+labels[c])
-    label = label == 5
+    label = label == 1
 
     # matplotlib.use('TkAgg')
     try:

@@ -13,7 +13,7 @@ and place it in your repository folder. <br>
   - If this is not your first time and you want to continue from where you stopped, then type y.
 4. In both options, you will write your name, and if this is your first time, a new folder by the name you typed will be created (this will be uploaded to canvas a a zip file once you are through all the data). This folder will save metadata in an Excel sheet (also by your name), a txt file where it shows how much time you spend labeling in total, and masks folder where it stores all your segmentations. <br>
 If this is not your first time, then type the same name you typed in your first time, the code will load your next unlabeled sample so you can continue from where you stopped.
-5. Below we provide a general description of the prompting tool features and usage. Alternatively, you can also watch this tutorial to familiarize yourself with the tool and start using it.
+5. Below we provide a general description of the prompting tool features and usage. Alternatively, you can also watch [this tutorial](https://www.youtube.com/watch?v=bysmOrTnKHs) to familiarize yourself with the tool and start using it.
 
   - **Tool layout.** Upon running and configuring the tool, a window with three figures will show up (see GIF below). From left to right: Image sample (in this case, a seismic image), ground-truth of the interest region (in this case, a salt dome), and (initially empty) SAM segmented area based on your promoted points along with the IOU. This last figure will be active once you select at least one green point and at least one red point, and will get updated with every new point added. <br><br><br> **Please try to achieve the best possible segmentation on each sample**
 <br><br><br>

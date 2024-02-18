@@ -24,6 +24,8 @@ from PIL import Image
 from segment_anything import sam_model_registry, SamPredictor
 import matplotlib
 
+plt.rcParams['keymap.grid'].remove('g')
+plt.rcParams['keymap.home'].remove('r')
 
 # %%
 # names=os.listdir('C:/Users/Mohammed/Downloads/saltdome')

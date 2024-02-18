@@ -334,8 +334,11 @@ while c < 150 and not f:
                     rp.append(np.multiply(red, 1))
                     ng.append(len(greenx))
                     nr.append(len(redx))
-                    stdx.append(statistics.pstdev(np.concatenate((greenx, redx))))
-                    stdy.append(statistics.pstdev(np.concatenate((greeny, redy))))
+                    grx = np.concatenate([greenx, redx])
+                    gry = np.concatenate([greeny, redy])
+
+                    stdx.append(statistics.pstdev(grx.astype(int).tolist()))
+                    stdy.append(statistics.pstdev(gry.astype(int).tolist()))
                     print("up count", count)
                     if maxx >= s:
                         print("inside",count)

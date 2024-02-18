@@ -24,6 +24,8 @@ from PIL import Image
 from segment_anything import sam_model_registry, SamPredictor
 import matplotlib
 
+plt.rcParams['keymap.grid'].remove('g')
+plt.rcParams['keymap.home'].remove('r')
 
 # %%
 # names=os.listdir('C:/Users/Mohammed/Downloads/saltdome')
@@ -55,6 +57,11 @@ def closetn(node, nodes):
 
 
 sys.path.append("..")
+
+try:
+    matplotlib.use('Qt5Agg')
+except:
+    matplotlib.use('TkAgg')
 
 sam_checkpoint = 'sam_vit_h_4b8939.pth'
 model_type = "vit_h"
@@ -116,7 +123,6 @@ if first == 'n':
     c = 0
     tim = 0
     t = time.time()
-
 else:
     from openpyxl import load_workbook
 
@@ -168,11 +174,6 @@ while c < 150 and not f:
     label = label == 1
 
     # matplotlib.use('TkAgg')
-    try:
-
-        matplotlib.use('Qt5Agg')
-    except:
-        matplotlib.use('TkAgg')
 
     while inc != "y":
         s = 0  # this is for the score
@@ -334,8 +335,11 @@ while c < 150 and not f:
                     rp.append(np.multiply(red, 1))
                     ng.append(len(greenx))
                     nr.append(len(redx))
-                    stdx.append(statistics.pstdev(np.concatenate((greenx, redx))))
-                    stdy.append(statistics.pstdev(np.concatenate((greeny, redy))))
+                    grx = np.concatenate([greenx, redx])
+                    gry = np.concatenate([greeny, redy])
+
+                    stdx.append(statistics.pstdev(grx.astype(int).tolist()))
+                    stdy.append(statistics.pstdev(gry.astype(int).tolist()))
                     print("up count", count)
                     if maxx >= s:
                         print("inside",count)

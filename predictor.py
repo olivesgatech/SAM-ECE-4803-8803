@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Feb 19 14:25:18 2024
+
+@author: Mohammed
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Jan 10 01:47:37 2024
 
 @author: Mohammed
@@ -27,9 +34,7 @@ import matplotlib
 plt.rcParams['keymap.grid'].remove('g')
 plt.rcParams['keymap.home'].remove('r')
 
-# %%
-# names=os.listdir('C:/Users/Mohammed/Downloads/saltdome')
-# labels=os.listdir('C:/Users/Mohammed/Downloads/labels')
+
 def show_mask(mask, ax, random_color=False):
     if random_color:
         color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
@@ -96,6 +101,7 @@ if first == 'n':
     #     ws[chr(73+i*5)+'1']='SD of green of '+str(i)
     #     ws[chr(74+i*5)+'1']='SD of red of '+str(i)
     #     ws[chr(75+i*5)+'1']='score of '+str(i)
+    serv=np.array([])
     for i in range(9):
         coun = 1
         for col in ws.iter_cols(min_row=1, max_row=1, max_col=12 + i * 5, min_col=7 + i * 5):
@@ -125,13 +131,13 @@ if first == 'n':
     t = time.time()
 else:
     from openpyxl import load_workbook
-
+    
     name = input("what is your name?\n")
     wb = load_workbook(os.path.join(name, name + ".xlsx"))
     ws = wb.active
     c = len(os.listdir(os.path.join(name, "masks")))
     f = open(os.path.join(name, "time.txt"), 'r')
-
+    serv=np.load(os.path.join(name,"servey.npy"))
     tim = f.readline()
     t = time.time()
     f.close()
@@ -166,11 +172,11 @@ while c < 150 and not f:
     green = []
     red = []
     greenx = []
-
+    
     redx = []
     greeny = []
     redy = []
-    # label=plt.imread('C:/Users/Mohammed/Downloads/labels/'+labels[c])
+    # label=plt.imread('C:/Users/Mohammed/Downloads/labels/'+labels[c])i9i
     label = label == 1
 
     # matplotlib.use('TkAgg')
@@ -499,12 +505,22 @@ while c < 150 and not f:
     np.save(os.path.join(name,"eachround",str(c)+"_"),round)
 
     c += 1
+    ans=input("Do you think the ground truth mask was suboptimal? (i.e. are SAM's results qualitatively better) y or n\n") 
+    while ans!="y" and ans!="n":
+        ans=input("Do you think the ground truth mask was suboptimal? (i.e. are SAM's results qualitatively better) y or n\n") 
+    ans = 1 if ans=="y" else 0 
+    
+    serv=np.append(serv,ans)
     contin = input("do u want to continue? press y if you want to continue or anyting otherwise ")
     if not contin == 'y':
         wb.save(os.path.join(name, name + '.xlsx'))
         f = True
-        file = open(os.path.join(name, "time.txt"), 'w')
-        file.write(str(float(tim) + (time.time() - t)))
-        file.close()
+        # file = open(os.path.join(name, "time.txt"), 'w')
+        # file.write(str(float(tim) + (time.time() - t)))
+        # file.close()
     print("Sample:", c)
 wb.save(os.path.join(name, name + '.xlsx'))
+file = open(os.path.join(name, "time.txt"), 'w')
+file.write(str(float(tim) + (time.time() - t)))
+np.save(os.path.join(name,"servey.npy"),serv)
+file.close()

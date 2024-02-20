@@ -137,7 +137,7 @@ else:
     ws = wb.active
     c = len(os.listdir(os.path.join(name, "masks")))
     f = open(os.path.join(name, "time.txt"), 'r')
-    serv=np.load(os.path.join(name,"servey.npy"))
+    serv=np.load(os.path.join(name,"servey.npy")) if os.path.exists(os.path.join(name,"servey.npy")) else np.array([])
     tim = f.readline()
     t = time.time()
     f.close()

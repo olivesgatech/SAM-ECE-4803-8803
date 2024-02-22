@@ -34,6 +34,17 @@ import matplotlib
 plt.rcParams['keymap.grid'].remove('g')
 plt.rcParams['keymap.home'].remove('r')
 
+MEDIUM_STAR_SIZE = 50 
+MEDIUM_GREEN_RED_DOT_SIZE = 5
+SMALL_STAR_SIZE = 10
+SMALL_GREEN_RED_DOT_SIZE = 2
+
+MEDIUM_DOT_SIZE_MODE = False
+SMALL_DOT_SIZE_MODE = True
+dot_size_toggle = SMALL_DOT_SIZE_MODE # small dot size by default
+GREEN_COLOR = '#00f700'
+RED_COLOR = '#ff1919'
+
 
 def show_mask(mask, ax, random_color=False):
     if random_color:
@@ -48,10 +59,17 @@ def show_mask(mask, ax, random_color=False):
 def show_points(coords, labels, ax, marker_size=50):
     pos_points = coords[labels == 1]
     neg_points = coords[labels == 0]
-    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white',
+    
+    if dot_size_toggle == MEDIUM_DOT_SIZE_MODE:
+        ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
+                linewidth=1.25)
+        ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
                linewidth=1.25)
-    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white',
-               linewidth=1.25)
+    else:
+        ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
+                linewidth=0.5)
+        ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
+               linewidth=0.5)
 
 
 def closetn(node, nodes):
@@ -186,6 +204,9 @@ while c < 150 and not f:
         count = 1  # to count the score max
         lessfive = 0
         current_color = 'green'
+        dot_size_toggle = SMALL_DOT_SIZE_MODE # default will be small dot, not medium
+        current_star_size = SMALL_STAR_SIZE
+        current_green_red_dot_size = SMALL_GREEN_RED_DOT_SIZE
         # get_ipython().run_line_magic('matplotlib', 'qt')
         fig, ax = plt.subplots(1, 3, figsize=(15, 7))
         if green and red:
@@ -228,8 +249,8 @@ while c < 150 and not f:
                         greenx.append(x)
 
                         greeny.append(y)
-                        ax[0].plot(x, y, 'go', markersize=5)
-                        ax[1].plot(x, y, 'go', markersize=5)
+                        ax[0].plot(x, y, 'go', markersize=current_green_red_dot_size, color = GREEN_COLOR)
+                        ax[1].plot(x, y, 'go', markersize=current_green_red_dot_size, color = GREEN_COLOR)
                         plt.draw()
 
                     else:
@@ -237,8 +258,8 @@ while c < 150 and not f:
                         redx.append(x)
 
                         redy.append(y)
-                        ax[0].plot(x, y, 'ro', markersize=5)
-                        ax[1].plot(x, y, 'ro', markersize=5)
+                        ax[0].plot(x, y, 'ro', markersize=current_green_red_dot_size, color = RED_COLOR)
+                        ax[1].plot(x, y, 'ro', markersize=current_green_red_dot_size, color = RED_COLOR)
                         plt.draw()
 
                 elif event.button is MouseButton.RIGHT:
@@ -327,7 +348,7 @@ while c < 150 and not f:
                     else:
                         s = intersection / union
                     # ws[chr(68)+str(c+2)]=str(bs) # start at cell D(c)
-                    show_points(input_point, input_label, ax[2])
+                    show_points(input_point, input_label, ax[2], marker_size = current_star_size)
                     msg = ""
 
                     if len(score[round[0]:]) == 0:
@@ -405,6 +426,10 @@ while c < 150 and not f:
             global redy
             global current_color
             global count
+            global current_star_size
+            global current_green_red_dot_size
+            global dot_size_toggle
+            
             if event.key == 'g':
                 current_color = 'green'
                 print("Switched to GREEN dot mode.")
@@ -429,8 +454,21 @@ while c < 150 and not f:
                 show_mask(mask, ax[2])
                 count = 1
                 print("below count", count)
-
-
+            elif event.key == 'z':
+                dot_size_toggle = not dot_size_toggle
+                
+                if dot_size_toggle == SMALL_DOT_SIZE_MODE:
+                    # true => smaller dot size
+                    current_star_size = SMALL_STAR_SIZE
+                    current_green_red_dot_size = SMALL_GREEN_RED_DOT_SIZE
+                    print("Switched to SMALL DOT SIZE mode.")
+                else:
+                    # false => default dot size
+                    current_star_size = MEDIUM_STAR_SIZE
+                    current_green_red_dot_size = MEDIUM_GREEN_RED_DOT_SIZE
+                    print("Switched to MEDIUM DOT SIZE mode.")
+                
+                
 
         # Create a figure and display the image
 

@@ -164,7 +164,7 @@ else:
 print(c)
 f = False
 ## start looping through samples: 
-while c < 150 and not f:
+while c < 400 and not f:
     msk = []  # masks for each samples
 
     gp = []  # green points

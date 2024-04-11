@@ -1,5 +1,4 @@
 import sys, os
-import torch
 import cv2
 import statistics
 import time
@@ -11,38 +10,7 @@ from openpyxl import Workbook, load_workbook
 from segment_anything import sam_model_registry, SamPredictor
 
 from config import *
-
-plt.rcParams['keymap.grid'].remove('g')
-plt.rcParams['keymap.home'].remove('r')
-
-
-
-def show_mask(mask, ax, random_color=False):
-    if random_color:
-        color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
-    else:
-        color = np.array([30 / 255, 144 / 255, 255 / 255, 0.6])
-    h, w = mask.shape[-2:]
-    mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
-    ax.imshow(mask_image)
-
-
-def show_points(coords, labels, ax, marker_size=50):
-    pos_points = coords[labels == 1]
-    neg_points = coords[labels == 0]
-
-    ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
-            linewidth=LINEWIDTH)
-    ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
-            linewidth=LINEWIDTH)
-
-
-def closetn(node, nodes):
-    nodes = np.asarray(nodes)
-    deltas = nodes - node
-    dist_2 = np.einsum('ij,ij->i', deltas, deltas)
-    return np.argmin(dist_2)
-
+from helpers import *
 
 sys.path.append("..")
 
@@ -51,9 +19,8 @@ try:
 except:
     matplotlib.use('TkAgg')
 
-
-
-
+plt.rcParams['keymap.grid'].remove('g')
+plt.rcParams['keymap.home'].remove('r')
 
 sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
 sam.to(device=DEVICE)
@@ -68,59 +35,23 @@ labels = np.load("labels.npy", allow_pickle=True)
 first = input("Do you want to load previous work? -y -n\n")
 while first != 'n' and first != 'y':
     first = input("Chose y or n, Do you want to load previous work? -y -n\n")
+
+name = input("what is your name?\n")
 if first == 'n':
-    wb = Workbook()
-    ws = wb.active
-    ws['A1'] = 'slice'
-    ws['B1'] = '# green dots of best'
-    ws['C1'] = '# red dots of best '
-    ws['D1'] = 'SD of green of best '
-    ws['E1'] = 'SD of red of best'
-    ws['F1'] = 'best score'
-    # for i in range(10):
-    #     ws[i+'1']='# green dots of '+str(i)
-    #     ws[chr(72+i*5)+'1']='# red dots of '+str(i)
-    #     ws[chr(73+i*5)+'1']='SD of green of '+str(i)
-    #     ws[chr(74+i*5)+'1']='SD of red of '+str(i)
-    #     ws[chr(75+i*5)+'1']='score of '+str(i)
+    wb, ws = create_workbook(name)
+    c      = 0
+    tim    = 0
     serv=np.array([])
-    for i in range(9):
-        coun = 1
-        for col in ws.iter_cols(min_row=1, max_row=1, max_col=12 + i * 5, min_col=7 + i * 5):
-            if coun == 1:
-                ws[col[0].coordinate] = '# green dots of ' + str(i + 2)
-            elif coun == 2:
-                ws[col[0].coordinate] = '# red dots of ' + str(i + 2)
-            elif coun == 3:
-                ws[col[0].coordinate] = 'SD of X of ' + str(i + 2)
-            elif coun == 4:
-                ws[col[0].coordinate] = 'SD of Y of ' + str(i + 2)
-            elif coun == 5:
-                ws[col[0].coordinate] = 'score of ' + str(i + 2)
-            coun += 1
-    name = input("Type your name:\n")
-
-    if not os.path.exists(name):
-        os.makedirs(name)
-        os.makedirs(os.path.join(name, "masks"))
-        os.makedirs(os.path.join(name, "points"))
-        os.makedirs(os.path.join(name, "sorts"))
-        os.makedirs(os.path.join(name, "eachround"))
-        os.makedirs(os.path.join(name, "scores"))
-
-    c = 0
-    tim = 0
-    t = time.time()
 else:
-    name = input("what is your name?\n")
     wb = load_workbook(os.path.join(name, name + ".xlsx"))
     ws = wb.active
     c = len(os.listdir(os.path.join(name, "masks")))
     f = open(os.path.join(name, "time.txt"), 'r')
     serv=np.load(os.path.join(name,"servey.npy")) if os.path.exists(os.path.join(name,"servey.npy")) else np.array([])
     tim = f.readline()
-    t = time.time()
     f.close()
+
+t = time.time()
 
 #### change that later
 print(c)

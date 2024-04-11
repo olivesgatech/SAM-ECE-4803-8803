@@ -1,6 +1,5 @@
 import torch
 
-using_colab = False
 MEDIUM_STAR_SIZE = 50 
 MEDIUM_GREEN_RED_DOT_SIZE = 5
 SMALL_STAR_SIZE = 10

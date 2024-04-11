@@ -1,6 +1,7 @@
 import sys
 import cv2
 import statistics
+import argparse
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -30,8 +31,16 @@ names  = np.load("samples.npy", allow_pickle=True)
 labels = np.load("labels.npy", allow_pickle=True)
 
 # %%
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process inputs for continuing work and providing a name.")
+    parser.add_argument("--continue", dest="continue_previous", action="store_true", help="Continue previous work")
+    parser.add_argument("name", type=str, default = None, nargs="?", help="The name to associate with the work")
+    args = parser.parse_args()
 
-c = workbook.open_workbook()
+    # Call the function with the parsed arguments.
+    c = workbook.open_workbook(args.continue_previous, args.name)
+else:
+    c = workbook.open_workbook()
 
 
 ## start looping through samples: 

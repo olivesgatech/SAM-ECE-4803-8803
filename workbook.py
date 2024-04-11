@@ -5,18 +5,25 @@ import numpy as np
 
 wb, ws, serv, tim, name, t = None, None, None, None, None, None
 
-def open_workbook():
+def open_workbook(continue_prev=False, in_name=None):
     global name, t
-    while True:
-        first = input("Do you want to load previous work? (y/n)\n").lower()
-        if first in ('y', 'n'):
-            break
-        print("Please choose 'y' for yes or 'n' for no.")
+    
+    if in_name:
+        name = in_name
+    else:
+        name = input("what is your name?\n")
+        
+    if not continue_prev:
+        while True:
+            first = input("Do you want to load previous work? (y/n)\n").lower()
+            if first in ('y', 'n'):
+                break
+            print("Please choose 'y' for yes or 'n' for no.")
 
-    name = input("what is your name?\n")
-
-    if first == 'n':
-        c = create_workbook()
+        if first == 'n':
+            c = create_workbook()
+        else:
+            c = open_existing_workbook()
     else:
         c = open_existing_workbook()
 

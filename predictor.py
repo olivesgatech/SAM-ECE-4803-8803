@@ -53,8 +53,8 @@ else:
 
 t = time.time()
 
-#### change that later
-print(c)
+
+
 f = False
 ## start looping through samples: 
 while c < 400 and not f:
@@ -69,7 +69,7 @@ while c < 400 and not f:
     label = labels[c]  # GT for sample c
     rmv = False
     mask = 0
-    # image=np.array(((image+1)/2)*255,dtype='uint8') 
+
     predictor.set_image(image)
     inc = ""
     co = 0
@@ -83,14 +83,12 @@ while c < 400 and not f:
     green = []
     red = []
     greenx = []
-    
     redx = []
     greeny = []
     redy = []
-    # label=plt.imread('C:/Users/Mohammed/Downloads/labels/'+labels[c])i9i
     label = label == 1
 
-    # matplotlib.use('TkAgg')
+
 
     while inc != "y":
         s = 0  # this is for the score
@@ -131,9 +129,6 @@ while c < 400 and not f:
                 x, y = int(event.xdata), int(event.ydata)
                 print(not x)
                 print(not y)
-                # if not x or not y:
-                #     inc=input("do you wish to continue?")
-                #     f=True
 
                 if event.button is MouseButton.LEFT:
                     if current_color == 'green':
@@ -162,29 +157,23 @@ while c < 400 and not f:
                     elif green:
                         print(current_color)
                         if current_color == 'green':
-                            # print("g",len(green))
-
                             indx = closetn((x, y), green)
                             print(indx)
                             for line in ax[0].lines:
                                 if len(line.get_xdata()) > 0:
                                     if line.get_xdata()[0] == green[indx][0] and line.get_ydata()[0] == green[indx][1]:
-                                        # print("Here1")
+
                                         line.set_data([], [])
                                         break
                             for line in ax[1].lines:
                                 if len(line.get_xdata()) > 0:
                                     if line.get_xdata()[0] == green[indx][0] and line.get_ydata()[0] == green[indx][1]:
-                                        # print("Here2")
                                         line.set_data([], [])
                                         break
                             del green[indx]
                             del greenx[indx]
 
                             del greeny[indx]
-
-                            # ax[0].plot(x, y, 'go', markersize=5)
-                            # ax[1].plot(x, y, 'go', markersize=5)
 
                             plt.draw()
                         elif red:
@@ -204,10 +193,7 @@ while c < 400 and not f:
                                     if line.get_xdata()[0] == red[indx][0] and line.get_ydata()[0] == red[indx][1]:
                                         line.set_data([], [])
                                         break
-                            # ax[0].plot(x, y, 'ro', markersize=5)
-                            # ax[1].plot(x, y, 'ro', markersize=5)
-                            # ax[0].set_offsets(red)
-                            # a.set_offsets(red)
+
                             del red[indx]
                             del redx[indx]
 
@@ -230,7 +216,6 @@ while c < 400 and not f:
 
                     mask = masks[0]
 
-                    # get_ipython().run_line_magic('matplotlib', 'inline')
                     ax[2].clear()
                     ax[2].imshow(image)
                     show_mask(mask, ax[2])
@@ -240,7 +225,7 @@ while c < 400 and not f:
                         s = 0
                     else:
                         s = intersection / union
-                    # ws[chr(68)+str(c+2)]=str(bs) # start at cell D(c)
+
                     show_points(input_point, input_label, ax[2], marker_size = current_star_size)
                     msg = ""
 
@@ -264,12 +249,8 @@ while c < 400 and not f:
                     if maxx >= s:
                         print("inside",count)
                         if count >= 10:
-
-
-                            # msg="\nNo better score is achieved in the last 5 attempts. Start round 2 from scra\nThe best score ("+str(round(max(score),2))+") is saved"
                             lessfive += 1
                         else:
-
                             count += 1
                     elif maxx < s:
 
@@ -380,31 +361,7 @@ while c < 400 and not f:
         cid = fig.canvas.mpl_connect('close_event', onclose)
         fig.show()  # this call does not block on my system
         fig.canvas.start_event_loop()  # block here until window closed
-        # After closing the image window, you can access the green and red pixel coordinate lists
 
-        # To select the truck, choose a point on it. Points are input to the model in (x,y) format and come with labels 1 (foreground point) or 0 (background point). Multiple points can be input; here we use only one. The chosen point will be shown as a star on the image.
-        # print("Hereeeeeeeee")
-
-        # ws['B'+str(c+2)]=str(len(green)) 
-        # ws['C'+str(c+2)]=str(len(red))
-        # ws['D'+str(c+2)]=str()
-        # input_point=np.concatenate((green,red))
-        # input_label=np.concatenate(([1]*len(green),[0]*len(red)))
-
-        # masks, scores, logits = predictor.predict(
-        #     point_coords=input_point,
-        #     point_labels=input_label,
-        #     multimask_output=True,
-        # )
-
-        # sleep(1)
-        # if np.max(score)<0.8:
-        #     print("your score should be more than 0.8, try again")
-        #     inc=""
-        #     co+=1
-        #     if co>=2:
-        #         inc=input("you tried more than 10 times\nYou can continue and save the best score ("+str(max(score))+")\nif you want to continue press y")
-        # else:
         inc = "y"
         print(inc)
 
@@ -446,9 +403,8 @@ while c < 400 and not f:
     if not contin == 'y':
         wb.save(os.path.join(name, name + '.xlsx'))
         f = True
-        # file = open(os.path.join(name, "time.txt"), 'w')
-        # file.write(str(float(tim) + (time.time() - t)))
-        # file.close()
+
+
     print("Sample:", c)
 wb.save(os.path.join(name, name + '.xlsx'))
 file = open(os.path.join(name, "time.txt"), 'w')

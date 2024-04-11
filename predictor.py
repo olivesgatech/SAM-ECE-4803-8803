@@ -1,49 +1,20 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Feb 19 14:25:18 2024
-
-@author: Mohammed
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 10 01:47:37 2024
-
-@author: Mohammed
-"""
-
-import sys
-from time import sleep
-
-using_colab = False
-import numpy as np
+import sys, os
 import torch
-import matplotlib.pyplot as plt
 import cv2
-from openpyxl import Workbook
 import statistics
-import os
-import random
-from IPython import get_ipython
-from matplotlib.backend_bases import MouseButton
 import time
-from PIL import Image
-from segment_anything import sam_model_registry, SamPredictor
+import numpy as np
 import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.backend_bases import MouseButton
+from openpyxl import Workbook, load_workbook
+from segment_anything import sam_model_registry, SamPredictor
+
+from config import *
 
 plt.rcParams['keymap.grid'].remove('g')
 plt.rcParams['keymap.home'].remove('r')
 
-MEDIUM_STAR_SIZE = 50 
-MEDIUM_GREEN_RED_DOT_SIZE = 5
-SMALL_STAR_SIZE = 10
-SMALL_GREEN_RED_DOT_SIZE = 2
-
-MEDIUM_DOT_SIZE_MODE = False
-SMALL_DOT_SIZE_MODE = True
-dot_size_toggle = SMALL_DOT_SIZE_MODE # small dot size by default
-GREEN_COLOR = '#00f700'
-RED_COLOR = '#ff1919'
 
 
 def show_mask(mask, ax, random_color=False):
@@ -59,17 +30,11 @@ def show_mask(mask, ax, random_color=False):
 def show_points(coords, labels, ax, marker_size=50):
     pos_points = coords[labels == 1]
     neg_points = coords[labels == 0]
-    
-    if dot_size_toggle == MEDIUM_DOT_SIZE_MODE:
-        ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
-                linewidth=1.25)
-        ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
-               linewidth=1.25)
-    else:
-        ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
-                linewidth=0.5)
-        ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
-               linewidth=0.5)
+
+    ax.scatter(pos_points[:, 0], pos_points[:, 1], color=GREEN_COLOR, marker='*', s=marker_size, edgecolor='white',
+            linewidth=LINEWIDTH)
+    ax.scatter(neg_points[:, 0], neg_points[:, 1], color=RED_COLOR, marker='*', s=marker_size, edgecolor='white',
+            linewidth=LINEWIDTH)
 
 
 def closetn(node, nodes):
@@ -86,13 +51,12 @@ try:
 except:
     matplotlib.use('TkAgg')
 
-sam_checkpoint = 'sam_vit_h_4b8939.pth'
-model_type = "vit_h"
 
-device = "cuda" if torch.cuda.is_available() else 'cpu'
 
-sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-sam.to(device=device)
+
+
+sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
+sam.to(device=DEVICE)
 
 predictor = SamPredictor(sam)
 
@@ -148,8 +112,6 @@ if first == 'n':
     tim = 0
     t = time.time()
 else:
-    from openpyxl import load_workbook
-    
     name = input("what is your name?\n")
     wb = load_workbook(os.path.join(name, name + ".xlsx"))
     ws = wb.active

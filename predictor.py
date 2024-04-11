@@ -99,6 +99,8 @@ while c < MAX_SAMPLES:
             global label
             global mask
             global lessfive
+            global s
+
             if event.xdata is not None and event.ydata is not None:
 
                 x, y = int(event.xdata), int(event.ydata)
@@ -126,57 +128,9 @@ while c < MAX_SAMPLES:
                         plt.draw()
 
                 elif event.button is MouseButton.RIGHT:
-
-                    if not green and not red:
-                        print("no points to delete")
-                    elif green:
-                        print(current_color)
-                        if current_color == 'green':
-                            indx = closetn((x, y), green)
-                            print(indx)
-                            for line in ax[0].lines:
-                                if len(line.get_xdata()) > 0:
-                                    if line.get_xdata()[0] == green[indx][0] and line.get_ydata()[0] == green[indx][1]:
-
-                                        line.set_data([], [])
-                                        break
-                            for line in ax[1].lines:
-                                if len(line.get_xdata()) > 0:
-                                    if line.get_xdata()[0] == green[indx][0] and line.get_ydata()[0] == green[indx][1]:
-                                        line.set_data([], [])
-                                        break
-                            del green[indx]
-                            del greenx[indx]
-
-                            del greeny[indx]
-
-                            plt.draw()
-                        elif red:
-                            print("delete red")
-                            print(current_color)
-                            indx = closetn((x, y), red)
-                            print(indx)
-
-                            for line in ax[0].lines:
-                                if len(line.get_xdata()) > 0:
-                                    print()
-                                    if line.get_xdata()[0] == red[indx][0] and line.get_ydata()[0] == red[indx][1]:
-                                        line.set_data([], [])
-                                        break
-                            for line in ax[1].lines:
-                                if len(line.get_xdata()) > 0:
-                                    if line.get_xdata()[0] == red[indx][0] and line.get_ydata()[0] == red[indx][1]:
-                                        line.set_data([], [])
-                                        break
-
-                            del red[indx]
-                            del redx[indx]
-
-                            del redy[indx]
-                            plt.draw()
+                    green, red, greenx, greeny, redx, redy = delete_point(green, red, current_color, x, y, ax, greenx, greeny, redx, redy)
 
                 if green and red:
-                    global s
                     print("green:", green)
                     print("red:", red)
 

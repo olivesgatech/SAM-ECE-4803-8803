@@ -11,6 +11,7 @@ from segment_anything import sam_model_registry, SamPredictor
 
 from config import *
 from helpers import *
+import workbook
 
 sys.path.append("..")
 
@@ -32,26 +33,8 @@ labels = np.load("labels.npy", allow_pickle=True)
 
 # %%
 
-first = input("Do you want to load previous work? -y -n\n")
-while first != 'n' and first != 'y':
-    first = input("Chose y or n, Do you want to load previous work? -y -n\n")
+c = workbook.open_workbook()
 
-name = input("what is your name?\n")
-if first == 'n':
-    wb, ws = create_workbook(name)
-    c      = 0
-    tim    = 0
-    serv=np.array([])
-else:
-    wb = load_workbook(os.path.join(name, name + ".xlsx"))
-    ws = wb.active
-    c = len(os.listdir(os.path.join(name, "masks")))
-    f = open(os.path.join(name, "time.txt"), 'r')
-    serv=np.load(os.path.join(name,"servey.npy")) if os.path.exists(os.path.join(name,"servey.npy")) else np.array([])
-    tim = f.readline()
-    f.close()
-
-t = time.time()
 
 
 
@@ -59,11 +42,10 @@ f = False
 ## start looping through samples: 
 while c < 400 and not f:
     msk = []  # masks for each samples
-
-    gp = []  # green points
-    rp = []  # red points
+    gp  = []  # green points
+    rp  = []  # red points
     image = names[c]  # samples c
-    ws['A' + str(c + 2)] = str(c)  # samples name on excel
+    workbook.update_sample(c)
     if len(image.shape) == 2:
         image = cv2.cvtColor((np.array(((image + 1) / 2) * 255, dtype='uint8')), cv2.COLOR_GRAY2RGB)
     label = labels[c]  # GT for sample c
@@ -71,7 +53,6 @@ while c < 400 and not f:
     mask = 0
 
     predictor.set_image(image)
-    inc = ""
     co = 0
     bs = 0
     score = []
@@ -90,7 +71,7 @@ while c < 400 and not f:
 
 
 
-    while inc != "y":
+    while True:
         s = 0  # this is for the score
         count = 1  # to count the score max
         lessfive = 0
@@ -352,62 +333,24 @@ while c < 400 and not f:
         ax[1].imshow(label)
         # Connect mouse click and keyboard key events
         fig.canvas.mpl_connect('button_press_event', onclick)
-        # fig.canvas.start_event_loop(timeout=-5)
+
         fig.canvas.mpl_connect('key_press_event', toggle_color)
         fig.canvas.mpl_connect('key_press_event', toggle_color)
-        # fig.canvas.start_event_loop(timeout=-5)
-        # Display the plot
+
 
         cid = fig.canvas.mpl_connect('close_event', onclose)
         fig.show()  # this call does not block on my system
         fig.canvas.start_event_loop()  # block here until window closed
+        break
+ 
 
-        inc = "y"
-        print(inc)
+    workbook.save_metrics(c, score, ng, nr, stdx, stdy, gp, rp, msk, round)
+    workbook.update_survey()
 
-    indx = np.argsort(-np.array(score))
-    sscore = np.array(score)[indx]
-    sng = np.array(ng)[indx]
-    snr = np.array(nr)[indx]
-    sstdx = np.array(stdx)[indx]
-    sstdy = np.array(stdy)[indx]
-    for i in range(len(score)):
-        coun = 1
-        for col in ws.iter_cols(min_row=c + 2, max_row=c + 2, max_col=6 + i * 5, min_col=2 + i * 5):
-            if coun == 1:
-                ws[col[0].coordinate] = sng[i]
-            elif coun == 2:
-                ws[col[0].coordinate] = snr[i]
-            elif coun == 3:
-                ws[col[0].coordinate] = sstdx[i]
-            elif coun == 4:
-                ws[col[0].coordinate] = sstdy[i]
-            elif coun == 5:
-                ws[col[0].coordinate] = sscore[i]
-            coun += 1
-    np.save(os.path.join(name, "points", str(c) + "_green"), np.array(gp, dtype=object))
-    np.save(os.path.join(name, "points", str(c) + "_red"), np.array(rp, dtype=object))
-    np.save(os.path.join(name, "masks", str(c) + "_mask"), np.array(msk))
-    np.save(os.path.join(name, "sorts", str(c) + "_sort"), indx)
-    np.save(os.path.join(name, "scores", str(c) + "score"), score)
-    np.save(os.path.join(name,"eachround",str(c)+"_"),round)
-
-    c += 1
-    ans=input("Do you think the ground truth mask was suboptimal? (i.e. are SAM's results qualitatively better) y or n\n") 
-    while ans!="y" and ans!="n":
-        ans=input("Do you think the ground truth mask was suboptimal? (i.e. are SAM's results qualitatively better) y or n\n") 
-    ans = 1 if ans=="y" else 0 
-    
-    serv=np.append(serv,ans)
     contin = input("do u want to continue? press y if you want to continue or anyting otherwise ")
     if not contin == 'y':
-        wb.save(os.path.join(name, name + '.xlsx'))
-        f = True
+        workbook.save_workbook()
+        break
 
-
+    c += 1
     print("Sample:", c)
-wb.save(os.path.join(name, name + '.xlsx'))
-file = open(os.path.join(name, "time.txt"), 'w')
-file.write(str(float(tim) + (time.time() - t)))
-np.save(os.path.join(name,"servey.npy"),serv)
-file.close()

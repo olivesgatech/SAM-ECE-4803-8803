@@ -1,12 +1,10 @@
-import sys, os
+import sys
 import cv2
 import statistics
-import time
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backend_bases import MouseButton
-from openpyxl import Workbook, load_workbook
 from segment_anything import sam_model_registry, SamPredictor
 
 from config import *
@@ -28,7 +26,7 @@ sam.to(device=DEVICE)
 
 predictor = SamPredictor(sam)
 
-names = np.load("samples.npy", allow_pickle=True)
+names  = np.load("samples.npy", allow_pickle=True)
 labels = np.load("labels.npy", allow_pickle=True)
 
 # %%
@@ -36,56 +34,52 @@ labels = np.load("labels.npy", allow_pickle=True)
 c = workbook.open_workbook()
 
 
-
-
-f = False
 ## start looping through samples: 
-while c < 400 and not f:
-    msk = []  # masks for each samples
-    gp  = []  # green points
-    rp  = []  # red points
-    image = names[c]  # samples c
+while c < MAX_SAMPLES:
     workbook.update_sample(c)
+    msk      = []        # masks for each samples
+    gp       = []        # green points
+    rp       = []        # red points
+    label    = labels[c] # GT for sample c
+    rmv      = False
+    mask     = 0     
+    co       = 0
+    bs       = 0
+    score    = []
+    round    = [0,0]
+    stdx     = []
+    stdy     = []
+    ng       = []
+    nr       = []
+    green    = []
+    red      = []
+    greenx   = []
+    redx     = []
+    greeny   = []
+    redy     = []
+    label    = label == 1 #
+    image    = names[c]   # samples c
+
     if len(image.shape) == 2:
         image = cv2.cvtColor((np.array(((image + 1) / 2) * 255, dtype='uint8')), cv2.COLOR_GRAY2RGB)
-    label = labels[c]  # GT for sample c
-    rmv = False
-    mask = 0
-
     predictor.set_image(image)
-    co = 0
-    bs = 0
-    score = []
-    round=[0,0]
-    stdx = []
-    stdy = []
-    ng = []
-    nr = []
-    green = []
-    red = []
-    greenx = []
-    redx = []
-    greeny = []
-    redy = []
-    label = label == 1
-
-
+    
 
     while True:
-        s = 0  # this is for the score
-        count = 1  # to count the score max
-        lessfive = 0
-        current_color = 'green'
-        dot_size_toggle = SMALL_DOT_SIZE_MODE # default will be small dot, not medium
-        current_star_size = SMALL_STAR_SIZE
+        s                          = 0  # this is for the score
+        count                      = 1  # to count the score max
+        lessfive                   = 0
+        current_color              = 'green'
+        dot_size_toggle            = SMALL_DOT_SIZE_MODE # default will be small dot, not medium
+        current_star_size          = SMALL_STAR_SIZE
         current_green_red_dot_size = SMALL_GREEN_RED_DOT_SIZE
-        # get_ipython().run_line_magic('matplotlib', 'qt')
+
         fig, ax = plt.subplots(1, 3, figsize=(15, 7))
         if green and red:
             ax[0].plot(greenx, greeny, 'go', markersize=5)
             ax[1].plot(greenx, greeny, 'go', markersize=5)
-            ax[0].plot(redx, redy, 'ro', markersize=5)
-            ax[1].plot(redx, redy, 'ro', markersize=5)
+            ax[0].plot(redx,   redy,   'ro', markersize=5)
+            ax[1].plot(redx,   redy,   'ro', markersize=5)
             plt.draw()
 
 
